@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConstruIA 360 - Plataforma Integral de Supervisión y Control de Obras con IA</title>
+  <meta name="description" content="Plataforma técnica de supervisión visual de obras, detección de EPP, recepción OCR e inventario predictivo.">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Lucide Icons (Vector Icons Sin Emojis) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon-box">
+          <i data-lucide="building-2"></i>
+        </div>
+        <div>
+          <div class="brand-title">ConstruIA 360</div>
+          <div class="brand-sub">Site Intelligence Suite</div>
+        </div>
+      </div>
+
+      <!-- SELECTOR DE PERFIL -->
+      <div class="role-switcher-box">
+        <div class="role-label-wrapper">
+          <span class="role-label">Perfil Operativo</span>
+          <span class="role-badge-indicator" id="currentRoleLabelObra">GERENTE</span>
+        </div>
+        <select id="roleSelectorObra" class="role-select">
+          <option value="gerente" selected>Director / Gerente de Obra</option>
+          <option value="residente">Residente de Obra</option>
+          <option value="seguridad">Supervisor de Seguridad EPP</option>
+          <option value="almacen">Encargado de Almacén</option>
+          <option value="compras">Responsable de Compras</option>
+        </select>
+      </div>
+
+      <!-- NAVEGACIÓN -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Control de Producción</div>
+
+        <a href="#dashboard" class="nav-item active" data-view="dashboard">
+          <i data-lucide="layout-dashboard" class="nav-icon-svg"></i>
+          <span>Dashboard Ejecutivo</span>
+        </a>
+
+        <a href="#vision_epp" class="nav-item" data-view="vision_epp">
+          <i data-lucide="hard-hat" class="nav-icon-svg"></i>
+          <span>Supervisión Visual EPP</span>
+          <span class="nav-badge-count danger">1</span>
+        </a>
+
+        <div class="nav-section-title">Logística & Abastecimiento</div>
+
+        <a href="#ocr_almacen" class="nav-item" data-view="ocr_almacen">
+          <i data-lucide="scan" class="nav-icon-svg"></i>
+          <span>Recepción & OCR Almacén</span>
+        </a>
+
+        <a href="#prediccion_stock" class="nav-item" data-view="prediccion_stock">
+          <i data-lucide="boxes" class="nav-icon-svg"></i>
+          <span>Stock & Compras IA</span>
+          <span class="nav-badge-count danger">2.4d</span>
+        </a>
+
+        <a href="#maquinaria" class="nav-item" data-view="maquinaria">
+          <i data-lucide="truck" class="nav-icon-svg"></i>
+          <span>Maquinaria & Rendimiento</span>
+        </a>
+
+        <div class="nav-section-title">Documentación & Soporte</div>
+
+        <a href="#bitacora_rag" class="nav-item" data-view="bitacora_rag">
+          <i data-lucide="file-text" class="nav-icon-svg"></i>
+          <span>Bitácora Diaria & RAG</span>
+        </a>
+      </nav>
+
+      <!-- FOOTER -->
+      <div class="sidebar-footer">
+        <div>
+          <strong>UAGRM</strong> • Grupo 9<br>
+          <span style="color:var(--text-light); font-size:0.68rem;">Ingeniería de Software II</span>
+        </div>
+        <a href="https://github.com/DiegoxdGarcia2/Prototipo_ConstruIA360" target="_blank" class="btn btn-secondary btn-sm" title="Ver Repositorio en GitHub">
+          <i data-lucide="github" style="width:14px; height:14px;"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="app-main">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title">
+            <h1>Centro de Control de Obra ConstruIA 360</h1>
+            <p>Monitoreo físico, seguridad con visión artificial, inventarios predictivos y asistente de obra</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="btnIniciarDemoTourObra" class="btn btn-primary btn-sm">
+            <i data-lucide="play" style="width:14px; height:14px;"></i>
+            <span>Demo Guiada</span>
+          </button>
+          <button id="btnToggleThemeObra" class="btn-icon" title="Cambiar Tema">
+            <i data-lucide="sun" style="width:16px; height:16px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTEXTO DE PROYECTO ACTIVO -->
+      <div class="project-context-bar">
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <span class="project-label">Proyecto: <strong class="project-name">Torre Mirador Equipetrol (18 Plantas)</strong></span>
+          <span class="project-pill">Etapa: Estructura de Hormigón</span>
+          <span class="project-pill pill-alert">
+            Desfase: -6% vs Cronograma Base
+          </span>
+        </div>
+        <div>
+          <span class="project-location">
+            Santa Cruz de la Sierra • Bolivia
+          </span>
+        </div>
+      </div>
+
+      <div class="content-wrapper">
+
+        <!-- ============================================================
+             VISTA 1: DASHBOARD EJECUTIVO 360
+             ============================================================ -->
+        <section id="view_dashboard" class="view-panel active">
+          
+          <!-- KPIS EJECUTIVOS (EXACTOS DEL PDF, SIN EMOJIS) -->
+          <div class="grid-6" id="dashboardKpisContainer" style="margin-bottom:24px;"></div>
+
+          <!-- GRÁFICOS: CURVA S Y BURN RATE -->
+          <div class="grid-2" style="margin-bottom:24px;">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="trending-up" style="width:18px; height:18px; color:var(--primary);"></i>
+                  <span>Curva S: Avance Físico Planificado vs Real vs Financiero</span>
+                </div>
+                <span class="project-pill" style="color:var(--primary);">Desviación -6%</span>
+              </div>
+              <div style="height:260px; position:relative;">
+                <canvas id="curvaSChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="dollar-sign" style="width:18px; height:18px; color:var(--accent-cyan);"></i>
+                  <span>Presupuesto & Burn Rate por Rubros</span>
+                </div>
+                <span class="project-pill" style="color:var(--accent-cyan);">+$42k Proyectado</span>
+              </div>
+              <div style="height:260px; position:relative;">
+                <canvas id="burnRateChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- FRENTES DE TRABAJO -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="hard-hat" style="width:18px; height:18px; color:var(--primary);"></i>
+                <span>Estado de Frentes de Trabajo Activos</span>
+              </div>
+            </div>
+            <table class="industrial-table">
+              <thead>
+                <tr>
+                  <th>Frente de Trabajo</th>
+                  <th>Responsable</th>
+                  <th>Avance Físico (%)</th>
+                  <th>Estado de Cronograma</th>
+                  <th>Cuadrilla</th>
+                </tr>
+              </thead>
+              <tbody id="frentesTrabajoTable"></tbody>
+            </table>
+          </div>
+
+        </section>
+
+
+        <!-- ============================================================
+             VISTA 2: SUPERVISIÓN VISUAL Y DETECCIÓN EPP
+             ============================================================ -->
+        <section id="view_vision_epp" class="view-panel">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div id="eppCasesSelector" style="display:flex; gap:8px;"></div>
+            <div style="display:flex; gap:8px;">
+              <button id="btnToggleBBoxesEPP" class="btn btn-secondary btn-sm">
+                <i data-lucide="eye" style="width:13px; height:13px;"></i>
+                <span>Alternar Cajas IA</span>
+              </button>
+              <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                <i data-lucide="upload" style="width:13px; height:13px;"></i>
+                <span>Subir Foto de Obra</span>
+                <input type="file" id="inputSubirFotoObra" accept="image/*" style="display:none;">
+              </label>
+            </div>
+          </div>
+
+          <div class="grid-60-40">
+            <!-- Canvas con Foto Real de Obra y Bounding Boxes YOLO -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="camera" style="width:18px; height:18px; color:var(--primary);"></i>
+                  <span>Detección de EPP con Visión Artificial (YOLOv8-Site)</span>
+                </div>
+                <span class="project-pill" style="border-color:var(--accent-red); color:var(--accent-red); font-weight:700;">
+                  Infracción Detectada
+                </span>
+              </div>
+
+              <div class="vision-canvas-container">
+                <canvas id="visionCanvas"></canvas>
+              </div>
+
+              <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">
+                  Fuente: Domo 4K Frente Norte Losa Nivel 4
+                </span>
+                <button id="btnGenerarIncidenciaEPP" class="btn btn-danger btn-sm">
+                  <i data-lucide="alert-triangle" style="width:14px; height:14px;"></i>
+                  <span>Generar Incidencia Automática</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Detalles de Infracciones -->
+            <div>
+              <div id="eppDetalleDetecciones"></div>
+              <div id="eppRecomendacionIA" style="margin-top:12px;"></div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ============================================================
+             VISTA 3: RECEPCIÓN DE MATERIALES Y OCR
+             ============================================================ -->
+        <section id="view_ocr_almacen" class="view-panel">
+          
+          <div class="grid-60-40">
+            <!-- Canvas con Documento Real y Scanner Láser -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="scan-line" style="width:18px; height:18px; color:var(--primary);"></i>
+                  <span>Digitalización OCR de Notas de Entrega / Remisiones</span>
+                </div>
+                <button id="btnEscanearOCR" class="btn btn-primary btn-sm">
+                  <i data-lucide="zap" style="width:14px; height:14px;"></i>
+                  <span>Escanear Remisión</span>
+                </button>
+              </div>
+
+              <div class="scanner-container" id="ocrScannerBox">
+                <div class="laser-line"></div>
+                <canvas id="ocrCanvas" style="display:block; margin:auto;"></canvas>
+              </div>
+
+              <div id="ocrStatusText" style="font-size:0.78rem; color:var(--text-muted); margin-top:10px;">
+                Presione "Escanear Remisión" para procesar el albarán físico y contrastar contra OC-8821.
+              </div>
+            </div>
+
+            <!-- Metadatos Extraídos -->
+            <div>
+              <div class="card" id="ocrResultadosCard" style="display:none;">
+                <div class="card-header">
+                  <div class="card-title">
+                    <i data-lucide="check-circle-2" style="width:18px; height:18px; color:var(--accent-green);"></i>
+                    <span>Metadatos Extraídos por OCR</span>
+                  </div>
+                  <span class="project-pill" style="color:var(--accent-green);">98.6% Confianza</span>
+                </div>
+
+                <table class="industrial-table" style="margin-bottom:14px;">
+                  <tbody>
+                    <tr><td><strong>Proveedor:</strong></td><td id="ocrProveedor">-</td></tr>
+                    <tr><td><strong>Nro. Remisión:</strong></td><td id="ocrNroRemision" style="font-family:var(--font-mono);">-</td></tr>
+                    <tr><td><strong>Material:</strong></td><td id="ocrMaterial">-</td></tr>
+                    <tr><td><strong>Cantidad Recibida:</strong></td><td id="ocrCantidad" style="font-weight:700; color:var(--primary); font-family:var(--font-mono);">-</td></tr>
+                    <tr><td><strong>Orden de Compra:</strong></td><td id="ocrOrdenCompra" style="font-family:var(--font-mono);">-</td></tr>
+                  </tbody>
+                </table>
+
+                <div id="ocrDiscrepanciaBox"></div>
+
+                <button id="btnIngresarStockOCR" class="btn btn-success" style="width:100%; margin-top:16px;">
+                  <i data-lucide="package-plus" style="width:15px; height:15px;"></i>
+                  <span>Confirmar Ingreso de +250 Bolsas al Inventario</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ============================================================
+             VISTA 4: PREDICCIÓN DE STOCK Y COMPRAS
+             ============================================================ -->
+        <section id="view_prediccion_stock" class="view-panel">
+          
+          <div class="grid-2" style="margin-bottom:20px;">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="boxes" style="width:18px; height:18px; color:var(--primary);"></i>
+                  <span>Inventario de Insumos & Proyección de Quiebre (ML)</span>
+                </div>
+              </div>
+              <table class="industrial-table">
+                <thead>
+                  <tr>
+                    <th>Material</th>
+                    <th>Stock Actual</th>
+                    <th>Consumo Medio</th>
+                    <th>Días Restantes</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="inventarioStockTableBody"></tbody>
+              </table>
+
+              <div style="margin-top:20px; background:var(--bg-app); border:1px solid var(--border-color); padding:14px; border-radius:8px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Simulador de Ritmo de Consumo (Cemento IP-30):</span>
+                  <strong id="displayRitmoConsumo" style="color:var(--primary); font-family:var(--font-mono);">75 bolsas/día</strong>
+                </div>
+                <input type="range" id="sliderRitmoConsumo" min="30" max="150" step="5" value="75" style="width:100%; accent-color:var(--primary);">
+                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-muted); margin-top:4px;">
+                  <span>Mínimo (30 bsa/d)</span>
+                  <span>Normal (75 bsa/d)</span>
+                  <span>Intensivo Doble Turno (150 bsa/d)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="trending-down" style="width:18px; height:18px; color:var(--accent-red);"></i>
+                  <span>Curva Predictiva de Extinción de Stock</span>
+                </div>
+                <span class="project-pill" style="color:var(--accent-red);">Alerta 2.4 Días</span>
+              </div>
+              <div style="height:280px; position:relative;">
+                <canvas id="stockProjectionChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i data-lucide="scale" style="width:18px; height:18px; color:var(--primary);"></i>
+                <span>Compras Inteligentes: Evaluación Multicriterio de Cotizaciones</span>
+              </div>
+              <span style="font-size:0.72rem; color:var(--text-muted);">Ponderación: Plazo de Entrega (50%) + Costo (30%) + Fiabilidad (20%)</span>
+            </div>
+            <div id="proveedoresComparadorContainer"></div>
+          </div>
+
+        </section>
+
+
+        <!-- ============================================================
+             VISTA 5: MAQUINARIA Y TELEMETRÍA
+             ============================================================ -->
+        <section id="view_maquinaria" class="view-panel">
+          
+          <div class="card" style="margin-bottom:20px; border-left:4px solid var(--primary);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <strong style="font-size:1.05rem; color:var(--primary);">Telemetría de Flota: Excavadora CAT 320 con 41% de Ociosidad</strong>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+                  Pérdida calculada de $184.50 USD/día por esperas de volquetes en rampa. Recomendación algorítmica: incorporar 3 volquetes de relevo.
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="window.construApp.mostrarNotificacion('Solicitud de 3 volquetes transmitida a transporte.', 'success')">
+                <i data-lucide="truck" style="width:14px; height:14px;"></i>
+                <span>Reasignar Flota de Volquetes</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="maquinariaCardsContainer"></div>
+
+        </section>
+
+
+        <!-- ============================================================
+             VISTA 6: BITÁCORA DIARIA & ASISTENTE RAG
+             ============================================================ -->
+        <section id="view_bitacora_rag" class="view-panel">
+          
+          <div class="grid-2">
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <i data-lucide="mic" style="width:18px; height:18px; color:var(--primary);"></i>
+                    <span>Dictado por Voz de Novedades de la Jornada</span>
+                  </div>
+                  <span id="bitacoraTimerClock" style="font-family:var(--font-mono); color:var(--primary); font-weight:700;">00:00</span>
+                </div>
+
+                <div class="audio-wave-box" id="bitacoraVoiceBox" style="background:var(--bg-card-solid); border:1px solid var(--border-color); border-radius:8px; padding:14px; margin-bottom:12px;">
+                  <button id="btnGrabarVozBitacora" class="btn btn-primary" style="width:100%;">
+                    <i data-lucide="mic" style="width:15px; height:15px;"></i>
+                    <span>Iniciar Dictado por Voz</span>
+                  </button>
+                </div>
+
+                <div id="bitacoraVoiceStatus" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:10px;">
+                  Inicie el dictado para registrar las actividades, personal y contingencias del día.
+                </div>
+
+                <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">
+                  Transcripción Cruda del Residente (Speech-to-Text):
+                </div>
+                <div id="bitacoraTranscripcionCruda" style="font-size:0.825rem; color:var(--text-main); font-style:italic; background:var(--bg-app); border:1px solid var(--border-color); padding:12px; border-radius:6px; margin-bottom:14px; min-height:60px;">
+                  Esperando dictado del residente...
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                  <button id="btnGenerarBitacoraAuto" class="btn btn-secondary" style="flex:1;">
+                    <i data-lucide="file-check" style="width:14px; height:14px;"></i>
+                    <span>Sintetizar con LLM</span>
+                  </button>
+                  <button id="btnImprimirBitacora" class="btn btn-primary">
+                    <i data-lucide="printer" style="width:14px; height:14px;"></i>
+                    <span>Imprimir / Exportar</span>
+                  </button>
+                </div>
+              </div>
+
+              <div id="bitacoraOficialReporte" style="margin-top:16px;"></div>
+            </div>
+
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <i data-lucide="bot" style="width:18px; height:18px; color:var(--primary);"></i>
+                    <span>Asistente RAG de Especificaciones Técnicas de Obra</span>
+                  </div>
+                </div>
+
+                <div style="margin-bottom:12px; display:flex; flex-wrap:wrap; gap:6px;">
+                  <button class="btn btn-sm btn-secondary btn-rag-faq">"Plazos de desencofrado de vigas"</button>
+                  <button class="btn btn-sm btn-secondary btn-rag-faq">"Resistencia del hormigón H-25"</button>
+                  <button class="btn btn-sm btn-secondary btn-rag-faq">"Normativa de arnés en altura"</button>
+                </div>
+
+                <div id="chatRAGFeed" style="height:360px; overflow-y:auto; border:1px solid var(--border-color); border-radius:8px; padding:14px; background:var(--bg-app); display:flex; flex-direction:column; gap:10px; margin-bottom:14px; font-size:0.825rem;">
+                  <div style="align-self:flex-start; background:var(--bg-card-solid); border:1px solid var(--border-color); padding:12px 16px; border-radius:8px; max-width:85%;">
+                    Asistente Técnico de <strong>ConstruIA 360</strong> activo. Respondo consultas sobre especificaciones del proyecto, plazos de curado, normativas de seguridad CBH-87 y estado del cronograma.
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="inputPreguntaRAG" class="form-control" placeholder="Escriba su consulta técnica...">
+                  <button id="btnEnviarPreguntaRAG" class="btn btn-primary btn-sm">Consultar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/bundle.js"></script>
+</body>
+</html>
